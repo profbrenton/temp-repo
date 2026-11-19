@@ -1,0 +1,13 @@
+version: 2.1
+jobs:
+  hello:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run: echo "ca test pipeline"
+workflows:
+  main:
+    jobs:
+      - hello:
+          context: ca-test-restricted
