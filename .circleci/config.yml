@@ -1,13 +1,9 @@
 version: 2.1
-jobs:
-  hello:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      - run: echo "ca test pipeline"
+setup: true
+orbs:
+  continuation: circleci/continuation@1.0.0
 workflows:
-  main:
+  setup:
     jobs:
-      - hello:
-          context: ca-test-restricted
+      - continuation/continue:
+          configuration_path: .circleci/continue.yml

@@ -1,0 +1,34 @@
+version: 2.1
+jobs:
+  hello:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - run: echo "ca test pipeline"
+  oidc-claims:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - run:
+          name: Decoded OIDC claims only (the token itself is never printed)
+          command: |
+            for v in CIRCLE_OIDC_TOKEN CIRCLE_OIDC_TOKEN_V2; do
+              echo "== $v claims"
+              p=$(printenv "$v" | cut -d. -f2 | tr '_-' '/+')
+              while [ $(( ${#p} % 4 )) -ne 0 ]; do p="$p="; done
+              printf %s "$p" | base64 -d | jq .
+            done
+      - run:
+          name: Which variables this job sees (lengths only)
+          command: |
+            echo "REUSE_TEST length: ${#REUSE_TEST}"
+            echo "DUMMY_VAR_01 length: ${#DUMMY_VAR_01}"
+            echo "AWS_ACCESS_KEY_ID length: ${#AWS_ACCESS_KEY_ID}"
+workflows:
+  main:
+    jobs:
+      - hello:
+          context: ca-test-restricted
+      - oidc-claims:
+          context: ca-test-unrestricted
